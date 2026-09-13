@@ -8,6 +8,11 @@ on:
     branches: [wio-tracker-l1]
   workflow_dispatch:
 
+env:
+  ARDUINO_CLI_VERSION: 1.5.1
+  ADAFRUIT_NRF52_VERSION: 1.7.0
+  ADAFRUIT_NRFUTIL_VERSION: 0.5.3.post16
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -27,20 +32,22 @@ jobs:
       - name: Install arduino-cli
         run: |
           mkdir -p "$HOME/.local/bin"
-          curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh \
-            | BINDIR="$HOME/.local/bin" sh
+          curl -fsSL -o arduino-cli.tar.gz \
+            "https://github.com/arduino/arduino-cli/releases/download/v${ARDUINO_CLI_VERSION}/arduino-cli_${ARDUINO_CLI_VERSION}_Linux_64bit.tar.gz"
+          tar -xzf arduino-cli.tar.gz -C "$HOME/.local/bin" arduino-cli
+          rm arduino-cli.tar.gz
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Install adafruit-nrfutil
-        run: pip install adafruit-nrfutil
+        run: pip install "adafruit-nrfutil==${ADAFRUIT_NRFUTIL_VERSION}"
 
       - name: Install nRF52 core and libraries
         run: |
           arduino-cli core update-index --config-file arduino-cli.yaml
-          arduino-cli core install adafruit:nrf52 --config-file arduino-cli.yaml
-          arduino-cli lib install "Adafruit GFX Library"
-          arduino-cli lib install "Adafruit SH110X"
-          arduino-cli lib install "Crypto"
+          arduino-cli core install adafruit:nrf52@$ADAFRUIT_NRF52_VERSION --config-file arduino-cli.yaml
+          arduino-cli lib install "Adafruit GFX Library@1.12.6"
+          arduino-cli lib install "Adafruit SH110X@2.1.15"
+          arduino-cli lib install "Crypto@0.4.0"
 
       - name: Build
         run: |

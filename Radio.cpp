@@ -741,6 +741,10 @@ void sx126x::setTxPower(int level, int outputPin) {
 
     executeOpcode(OP_PA_CONFIG_6X, pa_buf, 4); // set pa_config for high power
 
+    #if BOARD_MODEL == BOARD_WIO_L1 && BOARD_VARIANT == MODEL_1A
+        level -= 8; // Nominal gain of the external PA on this variant
+    #endif
+
     if (level > 22) { level = 22; }
     else if (level < -9) { level = -9; }
 

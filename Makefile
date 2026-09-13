@@ -91,6 +91,10 @@ firmware-techo:
 firmware-wio_l1:
 	arduino-cli compile --fqbn adafruit:nrf52:pca10056 $(COMMON_BUILD_FLAGS) --build-property "build.sd_name=s140" --build-property "build.sd_version=7.3.0" --build-property "build.sd_fwid=0x0123" --build-property "build.ldscript=nrf52840_s140_v7.ld" --build-property "compiler.c.elf.extra_flags=-L$(CURDIR)/linker" --build-property "compiler.cpp.extra_flags=\"-DBOARD_MODEL=0x53\""
 
+# Same board, but the 1W variant drives the sx1262 through an external 1 W PA.
+firmware-wio_l1_1w:
+	arduino-cli compile --fqbn adafruit:nrf52:pca10056 $(COMMON_BUILD_FLAGS) --build-property "build.sd_name=s140" --build-property "build.sd_version=7.3.0" --build-property "build.sd_fwid=0x0123" --build-property "build.ldscript=nrf52840_s140_v7.ld" --build-property "compiler.c.elf.extra_flags=-L$(CURDIR)/linker" --build-property "compiler.cpp.extra_flags=\"-DBOARD_MODEL=0x53\" \"-DBOARD_VARIANT=0x1A\""
+
 firmware-t3s3:
 	arduino-cli compile --fqbn "esp32:esp32:esp32s3:CDCOnBoot=cdc" $(COMMON_BUILD_FLAGS) --build-property "compiler.cpp.extra_flags=\"-DBOARD_MODEL=0x42\" \"-DBOARD_VARIANT=0xAB\""
 
@@ -447,6 +451,13 @@ release-wio_l1:
 	cp build/adafruit.nrf52.pca10056/RNode_Firmware_CE.ino.hex build/rnode_firmware_wio_l1.hex
 	adafruit-nrfutil dfu genpkg --dev-type 0x0052 --sd-req 0x0123 --application build/rnode_firmware_wio_l1.hex Release/rnode_firmware_wio_l1.zip
 	uf2conv build/rnode_firmware_wio_l1.hex -c -f 0xADA52840 -o Release/rnode_firmware_wio_l1.uf2
+	rm -r build
+
+release-wio_l1_1w:
+	arduino-cli compile --fqbn adafruit:nrf52:pca10056 $(COMMON_BUILD_FLAGS) --build-property "build.sd_name=s140" --build-property "build.sd_version=7.3.0" --build-property "build.sd_fwid=0x0123" --build-property "build.ldscript=nrf52840_s140_v7.ld" --build-property "compiler.c.elf.extra_flags=-L$(CURDIR)/linker" --build-property "compiler.cpp.extra_flags=\"-DBOARD_MODEL=0x53\" \"-DBOARD_VARIANT=0x1A\""
+	cp build/adafruit.nrf52.pca10056/RNode_Firmware_CE.ino.hex build/rnode_firmware_wio_l1_1w.hex
+	adafruit-nrfutil dfu genpkg --dev-type 0x0052 --sd-req 0x0123 --application build/rnode_firmware_wio_l1_1w.hex Release/rnode_firmware_wio_l1_1w.zip
+	uf2conv build/rnode_firmware_wio_l1_1w.hex -c -f 0xADA52840 -o Release/rnode_firmware_wio_l1_1w.uf2
 	rm -r build
 
 release-t3s3:

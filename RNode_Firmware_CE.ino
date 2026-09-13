@@ -212,6 +212,13 @@ void setup() {
   #endif
 
   #if BOARD_MODEL == BOARD_WIO_L1
+    #if BOARD_VARIANT == MODEL_1A
+      // Power the sx1262 and its external PA before the modem is probed
+      pinMode(pin_lora_pwr_en, OUTPUT);
+      digitalWrite(pin_lora_pwr_en, HIGH);
+      delay(10);
+    #endif
+
     // This firmware does not use the L76K GNSS; hold it in standby to
     // save power. LOW is the standby level.
     pinMode(pin_gnss_standby, OUTPUT);

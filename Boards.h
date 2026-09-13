@@ -123,9 +123,10 @@
   #define MODEL_16            0x16 // T-Echo 433 MHz
   #define MODEL_17            0x17 // T-Echo 868/915 MHz
 
-  #define PRODUCT_WIO_L1      0x18 // Seeed Wio Tracker L1 series (L1, L1 Pro)
+  #define PRODUCT_WIO_L1      0x18 // Seeed Wio Tracker L1 series (L1, L1 Pro, L1 Pro 1W)
   #define BOARD_WIO_L1        0x53
   #define MODEL_19            0x19 // Wio Tracker L1, 862-930 MHz
+  #define MODEL_1A            0x1A // Wio Tracker L1 Pro 1W, 862-930 MHz, SX1262 + 1 W PA
 
   #define PRODUCT_HMBRW       0xF0
   #define BOARD_HMBRW         0x32
@@ -1401,6 +1402,9 @@
       // generic adafruit:nrf52:pca10056 variant, so all pins below are raw
       // nRF GPIO numbers (port*32 + pin).
       #define _PINNUM(port, pin) ((port)*32 + (pin))
+      #ifndef BOARD_VARIANT
+        #define BOARD_VARIANT MODEL_19
+      #endif
       #define HAS_EEPROM false
       #define HAS_DISPLAY true
       #define DISPLAY MONO_OLED
@@ -1432,6 +1436,14 @@
               true   // DIO2_AS_RF_SWITCH
           }
       };
+
+      // The 1 W variant drives the antenna through an external PA and has no rx/tx switch
+      #if BOARD_VARIANT == MODEL_1A
+        #define WIO_L1_PIN_RXEN -1
+      #else
+        #define WIO_L1_PIN_RXEN _PINNUM(1, 8)
+      #endif
+
       const int8_t interface_pins[INTERFACE_COUNT][10] = {
                   // SX1262
           {
@@ -1443,7 +1455,7 @@
               _PINNUM(0, 7),  // pin_dio
               _PINNUM(1, 7),  // pin_reset
               -1,             // pin_txen
-              _PINNUM(1, 8),  // pin_rxen
+              WIO_L1_PIN_RXEN, // pin_rxen
               -1              // pin_tcxo_enable
           }
       };
@@ -1462,6 +1474,11 @@
 
       // L76K GNSS standby control (the GNSS is unused by this firmware)
       const int pin_gnss_standby = _PINNUM(1, 9);
+
+      #if BOARD_VARIANT == MODEL_1A
+        // LDO feeding the sx1262 and its external PA on the 1 W variant
+        const int pin_lora_pwr_en = _PINNUM(0, 14);
+      #endif
 
       // Single user LED (yellow)
       const int pin_led_rx = _PINNUM(1, 1);

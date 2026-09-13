@@ -1,0 +1,62 @@
+name: Wio Tracker L1 firmware
+
+on:
+  push:
+    branches: [wio-tracker-l1]
+    tags: ['wio-l1-*']
+  pull_request:
+    branches: [wio-tracker-l1]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Cache Arduino cores and libraries
+        uses: actions/cache@v4
+        with:
+          path: ~/.arduino15
+          key: arduino-nrf52-${{ hashFiles('.github/workflows/wio-l1.yml') }}
+
+      - name: Install arduino-cli
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh \
+            | BINDIR="$HOME/.local/bin" sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Install adafruit-nrfutil
+        run: pip install adafruit-nrfutil
+
+      - name: Install nRF52 core and libraries
+        run: |
+          arduino-cli core update-index --config-file arduino-cli.yaml
+          arduino-cli core install adafruit:nrf52 --config-file arduino-cli.yaml
+          arduino-cli lib install "Adafruit GFX Library"
+          arduino-cli lib install "Adafruit SH110X"
+          arduino-cli lib install "Crypto"
+
+      - name: Build
+        run: |
+          make release-wio_l1
+          make release-wio_l1_1w
+
+      - name: Report image sizes
+        run: ls -l Release/rnode_firmware_wio_l1*.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rnode_firmware_wio_l1
+          path: Release/rnode_firmware_wio_l1*.zip
+
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/wio-l1-')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: Release/rnode_firmware_wio_l1*.zip

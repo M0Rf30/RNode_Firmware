@@ -33,7 +33,13 @@
 // https://learn.adafruit.com/introducing-the-adafruit-nrf52840-feather/hathach-memory-map
 // each section follows along from one another, in this order
 // this is always at the start of the memory map
+#if BOARD_MODEL == BOARD_WIO_L1
+// This board ships SoftDevice S140 7.3.0, one page larger than the S140 6.1.1
+// used by the other nRF52840 boards
+#define APPLICATION_START 0x27000
+#else
 #define APPLICATION_START 0x26000
+#endif
 
 #define USER_DATA_START 0xED000
 

@@ -42,6 +42,19 @@
 
   void input_init() {
     pinMode(PIN_BUTTON, INPUT_PULLUP);
+    #if HAS_BTN_USR2 == true
+      pinMode(pin_btn_usr2, INPUT_PULLUP);
+    #endif
+  }
+
+  // On boards with two user buttons, the pair reads as one logical button
+  int input_read_button() {
+    #if HAS_BTN_USR2 == true
+      if (digitalRead(PIN_BUTTON) == PRESSED || digitalRead(pin_btn_usr2) == PRESSED) { return PRESSED; }
+      return RELEASED;
+    #else
+      return digitalRead(PIN_BUTTON);
+    #endif
   }
 
   void input_get_all_events() {
@@ -53,7 +66,7 @@
   }
 
   void input_read() {
-    int button_reading = digitalRead(PIN_BUTTON);
+    int button_reading = input_read_button();
     if (button_reading != debounce_state) {
       button_debounce_last = millis();
       debounce_state = button_reading;

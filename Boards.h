@@ -114,6 +114,11 @@
   #define MODEL_11            0x11 // RAK4631, 433 Mhz
   #define MODEL_12            0x12 // RAK4631, 868 Mhz
 
+  #define PRODUCT_WIO_L1      0x18 // Seeed Wio Tracker L1 series
+  #define BOARD_WIO_L1        0x53
+  #define MODEL_19            0x19 // Wio Tracker L1 / L1 Pro, 862-930 MHz, SX1262
+  #define MODEL_1A            0x1A // Wio Tracker L1 Pro 1W, 862-930 MHz, SX1262 + 1 W PA
+
   #define PRODUCT_HMBRW       0xF0
   #define BOARD_HMBRW         0x32
   #define BOARD_HUZZAH32      0x34
@@ -894,6 +899,64 @@
       const int DISPLAY_CLK = PIN_T114_TFT_SCK;
       const int DISPLAY_BL_PIN = PIN_T114_TFT_BLGT;
       const int DISPLAY_RST = PIN_T114_TFT_RST;
+
+    #elif BOARD_MODEL == BOARD_WIO_L1
+      #ifndef BOARD_VARIANT
+        #define BOARD_VARIANT MODEL_19
+      #endif
+      #define MODEM SX1262
+      #define HAS_EEPROM false
+      #define HAS_DISPLAY true
+      #define HAS_BLUETOOTH false
+      #define HAS_BLE true
+      #define HAS_CONSOLE false
+      #define HAS_PMU true
+      #define HAS_NP false
+      #define HAS_SD false
+      #define HAS_TCXO true
+      #define HAS_BUSY true
+      #define HAS_INPUT true
+      #define DIO2_AS_RF_SWITCH true
+      #define CONFIG_UART_BUFFER_SIZE 6144
+      #define CONFIG_QUEUE_SIZE 6144
+      #define CONFIG_QUEUE_MAX_LENGTH 200
+      #define EEPROM_SIZE 296
+      #define EEPROM_OFFSET EEPROM_SIZE-EEPROM_RESERVED
+      #define BLE_MANUFACTURER "Seeed Studio"
+      #define BLE_MODEL "Wio Tracker L1"
+      #define DISPLAY_SCALE 1
+
+      #define PIN_WIO_L1_BAT_EN 4
+      #define PIN_WIO_L1_OLED_SDA 6
+      #define PIN_WIO_L1_OLED_SCL 5
+      #define PIN_WIO_L1_BUZZER 32
+      #define PIN_WIO_L1_GNSS_STANDBY 41
+
+      // Side button and trackball centre press both act as the user button
+      #define HAS_BTN_USR2 true
+      const int pin_btn_usr1 = 8;
+      const int pin_btn_usr2 = 37;
+      const int pin_reset = 39;
+      const int pin_cs = 46;
+      const int pin_sclk = 30;
+      const int pin_mosi = 28;
+      const int pin_miso = 3;
+      const int pin_busy = 42;
+      const int pin_dio = 7;
+      const int pin_led_rx = 33;
+      const int pin_led_tx = 33;
+      const int pin_tcxo_enable = -1;
+      const int pin_vbat = 31;
+
+      // Following pins are for the sx1262. The 1W variant has no rx/tx switch,
+      // but needs the LDO feeding the sx1262 and its PA enabled at boot.
+      #if BOARD_VARIANT == MODEL_1A
+        #define PIN_WIO_L1_LORA_PWR_EN 14
+      #else
+        #define HAS_RF_SWITCH_RX_TX true
+        const int pin_rxen = 40;
+        const int pin_txen = -1;
+      #endif
 
     #else
       #error An unsupported nRF board was selected. Cannot compile RNode firmware.

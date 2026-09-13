@@ -703,6 +703,8 @@ void sx126x::enableTCXO() {
       uint8_t buf[4] = {MODE_TCXO_1_8V_6X, 0x00, 0x00, 0xFF};
     #elif BOARD_MODEL == BOARD_HELTEC32_V4
       uint8_t buf[4] = {MODE_TCXO_1_8V_6X, 0x00, 0x00, 0xFF};
+    #elif BOARD_MODEL == BOARD_WIO_L1
+      uint8_t buf[4] = {MODE_TCXO_1_8V_6X, 0x00, 0x00, 0xFF};
     #endif
     executeOpcode(OP_DIO3_TCXO_CTRL_6X, buf, 4);
   #endif
@@ -724,6 +726,10 @@ void sx126x::setTxPower(int level, int outputPin) {
   pa_buf[2] = 0x00; // DeviceSel 0x00 for SX1262 (0x01 for SX1261)
   pa_buf[3] = 0x01; // PALut always 0x01 (reserved according to datasheet)
   executeOpcode(OP_PA_CONFIG_6X, pa_buf, 4); // set pa_config for high power
+
+  #if BOARD_MODEL == BOARD_WIO_L1 && BOARD_VARIANT == MODEL_1A
+    level -= 8; // Nominal gain of the external PA on this variant
+  #endif
 
   if (level > 22) { level = 22; }
   else if (level < -9) { level = -9; }

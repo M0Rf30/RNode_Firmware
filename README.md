@@ -80,6 +80,8 @@ The RNode Firmware supports the following boards:
 - Heltec LoRa32 v4 devices
 - Heltec T114 devices
 - RAK4631 devices
+- Seeed Wio Tracker L1 / L1 Pro devices
+- Seeed Wio Tracker L1 Pro 1W devices (external PA)
 - SeeedStudio XIAO ESP32S3 devices (with Wio-SX1262)
 - Homebrew RNodes based on ATmega1284p boards
 - Homebrew RNodes based on ATmega2560 boards

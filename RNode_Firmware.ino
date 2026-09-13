@@ -90,6 +90,17 @@ void setup() {
       delay(200);
     #endif
 
+    #if BOARD_MODEL == BOARD_WIO_L1
+      #if BOARD_VARIANT == MODEL_1A
+        pinMode(PIN_WIO_L1_LORA_PWR_EN, OUTPUT);
+        digitalWrite(PIN_WIO_L1_LORA_PWR_EN, HIGH);
+      #endif
+      pinMode(PIN_WIO_L1_BUZZER, OUTPUT);
+      digitalWrite(PIN_WIO_L1_BUZZER, LOW);
+      pinMode(PIN_WIO_L1_GNSS_STANDBY, OUTPUT);
+      digitalWrite(PIN_WIO_L1_GNSS_STANDBY, LOW);
+    #endif
+
     if (!eeprom_begin()) { Serial.write("EEPROM initialisation failed.\r\n"); }
   #endif
 
@@ -129,7 +140,7 @@ void setup() {
     boot_seq();
   #endif
 
-  #if BOARD_MODEL != BOARD_RAK4631 && BOARD_MODEL != BOARD_HELTEC_T114 && BOARD_MODEL != BOARD_TECHO && BOARD_MODEL != BOARD_T3S3 && BOARD_MODEL != BOARD_TBEAM_S_V1 && BOARD_MODEL != BOARD_HELTEC32_V4
+  #if BOARD_MODEL != BOARD_RAK4631 && BOARD_MODEL != BOARD_HELTEC_T114 && BOARD_MODEL != BOARD_TECHO && BOARD_MODEL != BOARD_T3S3 && BOARD_MODEL != BOARD_TBEAM_S_V1 && BOARD_MODEL != BOARD_HELTEC32_V4 && BOARD_MODEL != BOARD_WIO_L1
     // Some boards need to wait until the hardware UART is set up before booting
     // the full firmware. In the case of the RAK4631 and Heltec T114, the line below will wait
     // until a serial connection is actually established with a master. Thus, it
